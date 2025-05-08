@@ -518,4 +518,290 @@ How to Tell in an Interview
 
 <!-- --------------------------------------------------------------------------------------------------------------------------------- -->
 
-<!-- Question 15:  -->
+<!-- Question 15: useReducer Hook  -->
+
+Definition
+useReducer is a React hook that is used for managing complex state logic in functional components. It is an alternative to useState when you need to handle state that depends on previous state values or when the logic of state transitions is more complex.
+
+useReducer is often preferred when:
+
+The state is an object or array.
+
+The state changes are based on previous state values.
+
+You want to centralize state update logic and separate it from the component rendering.
+
+Syntax
+const [state, dispatch] = useReducer(reducer, initialState);
+reducer: A function that defines how the state should change based on the action.
+
+initialState: The initial state value.
+
+state: The current state, which is updated based on dispatched actions.
+
+dispatch: A function that you call to send actions to the reducer function.
+
+Example Usage
+Let’s say we want to manage the state of a counter, which can be incremented, decremented, and reset.
+
+import React, { useReducer } from "react";
+
+// Reducer function that defines how state changes based on actions
+function counterReducer(state, action) {
+  switch (action.type) {
+    case "increment":
+      return { count: state.count + 1 };
+    case "decrement":
+      return { count: state.count - 1 };
+    case "reset":
+      return { count: 0 };
+    default:
+      return state;
+  }
+}
+
+function Counter() {
+  // Initial state is an object with a count property
+  const initialState = { count: 0 };
+
+  // useReducer hook to manage state and dispatch actions
+  const [state, dispatch] = useReducer(counterReducer, initialState);
+
+  return (
+    <div>
+      <h1>Count: {state.count}</h1>
+      <button onClick={() => dispatch({ type: "increment" })}>Increment</button>
+      <button onClick={() => dispatch({ type: "decrement" })}>Decrement</button>
+      <button onClick={() => dispatch({ type: "reset" })}>Reset</button>
+    </div>
+  );
+}
+
+export default Counter;
+counterReducer: A function that accepts the current state and an action and returns a new state.
+
+dispatch: Triggers a state change by passing an action with a type (e.g., "increment", "decrement", "reset").
+
+
+How to Tell in an Interview
+"The useReducer hook is useful when managing complex state logic in React. It provides a central place for handling all state updates through a reducer function. The hook takes a reducer function and an initial state and returns the current state and a dispatch function. Each action that gets dispatched to the reducer results in a state transition, making it ideal for scenarios where multiple state variables depend on each other or when complex state logic is required."
+
+<!-- ---------------------------------------- ------------------------------------------------------------------------------------------- -->
+
+<!-- Question 16 : useState vs useReducer -->
+
+Definition
+useState: A basic React hook for managing state in functional components. It is ideal for managing simple state values like numbers, strings, booleans, etc., that do not depend on each other or have complex logic.
+
+useReducer: A more advanced hook used when the state logic is more complex, especially when the state depends on the previous state or when there are multiple state transitions. It is based on the concept of reducers (similar to Redux) and is generally used when the state management involves multiple actions or state updates.
+
+<!-- When to Use useState -->
+Simple state updates (e.g., counters, toggles).
+
+When you don't need to manage state that depends on previous state values.
+
+Ideal for smaller, less complex components.
+
+<!-- When to Use useReducer -->
+Complex state transitions (e.g., updating an object or array with multiple fields).
+
+When state updates depend on the previous state value.
+
+Managing multiple state variables that need to be updated based on the same action.
+
+When you want to centralize your state management logic for clarity and maintainability.
+
+
+
+<!-- useState Example (Counter): -->
+
+import { useState } from "react";
+
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  const increment = () => setCount(count + 1);
+  const decrement = () => setCount(count - 1);
+
+  return (
+    <div>
+      <h1>{count}</h1>
+      <button onClick={increment}>Increment</button>
+      <button onClick={decrement}>Decrement</button>
+    </div>
+  );
+}
+
+<!-- useReducer Example (Counter with Multiple Actions):// -->
+import { useReducer } from "react";
+
+function counterReducer(state, action) {
+  switch (action.type) {
+    case "increment":
+      return { count: state.count + 1 };
+    case "decrement":
+      return { count: state.count - 1 };
+    default:
+      return state;
+  }
+}
+
+function Counter() {
+  const [state, dispatch] = useReducer(counterReducer, { count: 0 });
+
+  return (
+    <div>
+      <h1>{state.count}</h1>
+      <button onClick={() => dispatch({ type: "increment" })}>Increment</button>
+      <button onClick={() => dispatch({ type: "decrement" })}>Decrement</button>
+    </div>
+  );
+}
+
+<!-- How to Tell in an Interview -->
+useState: "I use useState for simple state management needs, such as counters, toggles, or input values, where the state doesn’t depend on complex logic or multiple actions."
+
+useReducer: "When managing more complex states or multiple related state transitions, I prefer useReducer. It gives me a structured way to handle state updates through actions, especially when dealing with objects or arrays."
+
+<!-- ------------------------------------------------------------------------------------------------------------------------------------ -->
+
+
+<!-- Question 17:React: Context API with useContext Hook -->
+
+Definition
+Context in React is a way to share values like global state or settings between components without passing props manually at every level of the component tree.
+
+useContext is a hook that allows you to access the value of a context directly in a functional component, without needing to use a Context.Consumer.
+
+How It Works
+The useContext hook is used in conjunction with the Context Provider. You create a context using React.createContext() and use a Context.Provider to pass the context value down the component tree. Then, any child component that needs access to the context value can use the useContext hook to consume the value.
+
+<!-- Steps to Use useContext -->
+<!-- Create a Context: -->
+You create a context using React.createContext(). This returns an object with two components: Provider and Consumer. Provider allows you to pass down the context value, while useContext allows you to consume it.
+
+const MyContext = React.createContext();
+
+Wrap Components with Context.Provider:
+The Provider component is used to provide a value to the context. Any child component wrapped inside this provider can access the context value.
+
+<MyContext.Provider value={{ name: "John", age: 30 }}>
+  <ChildComponent />
+</MyContext.Provider>
+
+Consume the Context Value with useContext:
+The useContext hook is used inside functional components to access the context value directly.
+
+import { useContext } from "react";
+
+function ChildComponent() {
+  const contextValue = useContext(MyContext);
+  return (
+    <div>
+      Name: {contextValue.name}, Age: {contextValue.age}
+    </div>
+  );
+}
+<!-- Example of Using Context with useContext -->
+Here’s an example demonstrating how to use useContext to share a user profile across different components:
+
+Create Context:
+
+import React, { createContext, useContext } from "react";
+
+const UserContext = createContext();
+\
+<!-- Wrap Application with Provider: -->
+
+function App() {
+  const user = { name: "John Doe", email: "john@example.com" };
+
+  return (
+    <UserContext.Provider value={user}>
+      <Profile />
+      <Dashboard />
+    </UserContext.Provider>
+  );
+}
+
+<!-- Consume Context Using useContext: -->
+
+
+function Profile() {
+  const user = useContext(UserContext);
+  return <div>Profile: {user.name}</div>;
+}
+
+function Dashboard() {
+  const user = useContext(UserContext);
+  return <div>Dashboard: {user.email}</div>;
+}
+
+In this example, both the Profile and Dashboard components consume the user data from UserContext.
+
+When to Use useContext
+Global state management: When you need to pass data deeply through the component tree without prop drilling.
+
+Theming: Passing the theme information (dark/light) down to many components.
+
+User authentication: Storing the authenticated user data and providing it across the app.
+
+Language preferences: Sharing the current language preference across components.
+
+<!-- Benefits of Using useContext -->
+Simplifies prop drilling: You can avoid passing props down through multiple levels of components.
+
+Encapsulates shared data: It allows you to easily manage and share state or configuration globally.
+
+Makes components more reusable: Components can be decoupled from their direct parent-child relationships and depend on the context instead.
+
+<!-- How to Tell in an Interview -->
+"I use the useContext hook when I need to share state or data across multiple components that are deeply nested in the component tree. It helps avoid prop drilling by allowing components to consume the context directly. For example, I might use it for managing global settings, user authentication, or theming."
+
+<!-- -------------------------------------------------------------------------------------------------------------------------------------- -->
+
+<!-- Question 18:React: Context -->
+
+Definition
+Context in React provides a way to share values (like data or functions) across the component tree without having to pass props manually at every level. It is especially useful for global data that many components might need access to — such as the current authenticated user, theme settings, or language preference.
+
+React Context helps avoid "prop drilling", where props are passed through intermediate components that do not need them just to reach deeply nested components.
+
+Example
+Creating a Context:
+
+import React from 'react';
+
+const MyContext = React.createContext("defaultValue");
+This creates a context with a default value. React.createContext() returns an object with two components:
+
+MyContext.Provider: Used to provide the value to children.
+
+MyContext.Consumer: Used to consume the context value (not needed if you use useContext hook).
+
+Providing the Context Value:
+
+<MyContext.Provider value="Hello from context!">
+  <Child />
+</MyContext.Provider>
+Consuming the Context (two ways):
+
+<!-- Using useContext Hook (preferred in functional components): -->
+import { useContext } from "react";
+
+function Child() {
+  const value = useContext(MyContext);
+  return <p>{value}</p>;
+}
+
+<!-- Using Consumer Component (older approach): -->
+
+<MyContext.Consumer>
+  {value => <p>{value}</p>}
+</MyContext.Consumer>
+
+<!-- How to Tell in an Interview -->
+"React Context is used to avoid prop drilling by allowing you to share data like user info, themes, or locale across deeply nested components. I typically create a context using React.createContext(), wrap my app or specific component tree with a Provider, and consume the data using the useContext hook. This makes my components more clean and maintainable, especially for global application state."
+
+<!-- ------------------------------------------------------------------------------------------------------------------------------------ -->
+<!-- ------------------------------------------------------------------------------------------------------------------------------------ -->
