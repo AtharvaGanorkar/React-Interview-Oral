@@ -803,5 +803,108 @@ function Child() {
 <!-- How to Tell in an Interview -->
 "React Context is used to avoid prop drilling by allowing you to share data like user info, themes, or locale across deeply nested components. I typically create a context using React.createContext(), wrap my app or specific component tree with a Provider, and consume the data using the useContext hook. This makes my components more clean and maintainable, especially for global application state."
 
-<!-- ------------------------------------------------------------------------------------------------------------------------------------ -->
-<!-- ------------------------------------------------------------------------------------------------------------------------------------ -->
+<!-- ----------------------------------------------------------------------------------------------------------------------- -->
+
+<!-- Question 19: Difference between UseEffect and UseCallback Hook? -->
+
+✅ What is useEffect?
+📘 Definition:
+useEffect is a React Hook that lets you perform side effects in functional components. Side effects include tasks like:
+
+Fetching data from an API
+
+Manipulating the DOM
+
+Setting up a subscription
+
+Starting and clearing timers
+
+⚙️ How It Works:
+It runs after the component renders.
+
+You can specify dependencies so that the effect only runs when certain values change.
+
+📌 Syntax:
+
+
+useEffect(() => {
+  // side effect code here
+}, [dependency1, dependency2]);
+If the dependency array is:
+
+[]: Runs only once after the first render (componentDidMount).
+[someVar]: Runs after the first render and whenever someVar changes.
+No array: Runs after every render.
+
+✅ Example: Fetch data on mount
+
+import React, { useEffect, useState } from "react";
+
+function UserList() {
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    fetch("https://jsonplaceholder.typicode.com/users")
+      .then((res) => res.json())
+      .then((data) => setUsers(data));
+  }, []); // Empty dependency array = run once on mount
+
+  return (
+    <ul>
+      {users.map((user) => (
+        <li key={user.id}>{user.name}</li>
+      ))}
+    </ul>
+  );
+}
+
+
+✅ What is useCallback?
+📘 Definition:
+useCallback is a React Hook that returns a memoized version of a callback function. It helps avoid re-creating the function unless its dependencies change.
+
+It is useful when passing functions as props to child components — to prevent unnecessary re-renders.
+
+⚙️ How It Works:
+It remembers (memoizes) a function unless the dependencies change.
+
+📌 Syntax:
+
+const memoizedFunction = useCallback(() => {
+  // logic
+}, [dependency1, dependency2]);
+
+✅ Example: Prevent unnecessary re-renders
+
+import React, { useState, useCallback } from "react";
+
+const Button = React.memo(({ onClick, label }) => {
+  console.log(`Rendering button - ${label}`);
+  return <button onClick={onClick}>{label}</button>;
+});
+
+function Counter() {
+  const [count, setCount] = useState(0);
+  const [text, setText] = useState("");
+
+  const increment = useCallback(() => {
+    setCount((prev) => prev + 1);
+  }, []);
+
+  return (
+    <div>
+      <input value={text} onChange={(e) => setText(e.target.value)} />
+      <Button onClick={increment} label="Increment" />
+      <p>Count: {count}</p>
+    </div>
+  );
+}
+
+Without useCallback, the increment function would be recreated on every render, causing the Button component to re-render even when it didn’t need to.
+
+🗣️ How to Answer in an Interview:
+"useEffect is a hook used to perform side effects in React like data fetching, DOM updates, or timers. It runs after the component renders and can re-run based on dependencies. On the other hand, useCallback is used to memoize functions so they don’t get recreated on every render. This is particularly useful when passing functions as props to child components to prevent unnecessary re-renders."
+
+<---------------------------------------------------------------------------------------------------------------------------- -->
+
+<!-- Question 20:  -->
