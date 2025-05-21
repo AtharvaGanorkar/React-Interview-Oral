@@ -907,4 +907,288 @@ Without useCallback, the increment function would be recreated on every render, 
 
 <---------------------------------------------------------------------------------------------------------------------------- -->
 
-<!-- Question 20:  -->
+<!-- Question 20: diff between UseMemo and UseCallback   -->
+
+React provides both useMemo and useCallback hooks for performance optimization by avoiding unnecessary re-renders and recalculations. While they are similar in how they accept dependencies, their purpose is different.
+
+🧠 useMemo — Detailed Explanation
+✅ Definition:
+useMemo is a React Hook that returns a memoized value. It is used to avoid re-executing expensive calculations on every render unless its dependencies have changed.
+
+📘 Syntax:
+
+const memoizedValue = useMemo(() => computeExpensiveValue(a, b), [a, b]);
+computeExpensiveValue → a function that returns the result you want to cache.
+
+[a, b] → dependency array: recompute only when a or b changes.
+
+
+
+💡 Real-World Example (useMemo):
+
+import React, { useMemo, useState } from 'react';
+
+function ExpensiveComponent({ number }) {
+  const [count, setCount] = useState(0);
+
+  const squaredNumber = useMemo(() => {
+    console.log("Calculating square...");
+    return number * number;
+  }, [number]);
+
+  return (
+    <div>
+      <p>Square: {squaredNumber}</p>
+      <button onClick={() => setCount(count + 1)}>Re-render Component</button>
+    </div>
+  );
+}
+
+🧪 Behavior:
+On first render, it logs "Calculating square..." and computes.
+
+When you click the button, the component re-renders, but the square is not recalculated because number hasn't changed.
+
+
+⚙️ useCallback — Detailed Explanation
+✅ Definition:
+useCallback is a React Hook that returns a memoized version of a callback function, which helps prevent unnecessary re-creations of the function between renders.
+
+
+📘 Syntax:
+javascript
+Copy
+Edit
+const memoizedCallback = useCallback(() => {
+  doSomething(a, b);
+}, [a, b]);
+The function inside is only recreated if dependencies (a, b) change.
+
+
+💡 Real-World Example (useCallback):
+
+import React, { useState, useCallback } from 'react';
+
+function Child({ onClick }) {
+  console.log("Child rendered");
+  return <button onClick={onClick}>Click Me</button>;
+}
+
+function Parent() {
+  const [count, setCount] = useState(0);
+
+  const handleClick = useCallback(() => {
+    setCount((c) => c + 1);
+  }, []);
+
+  return <Child onClick={handleClick} />;
+}
+🧪 Behavior:
+Without useCallback, handleClick would be a new function on every render, causing Child to re-render.
+
+With useCallback, the same handleClick reference is reused unless dependencies change, so Child only re-renders when necessary.
+
+
+🔄 Comparison Table
+
+| Feature          | `useMemo`                                    | `useCallback`                                             |
+| ---------------- | -------------------------------------------- | --------------------------------------------------------- |
+| Purpose          | Memoizes the result of a function            | Memoizes the function itself                              |
+| Returns          | A computed **value**                         | A **function**                                            |
+| Use Case         | Expensive computation                        | Avoiding unnecessary function re-renders                  |
+| Returns Same?    | Returns same value if dependencies unchanged | Returns same function reference if dependencies unchanged |
+| Typical Use Case | Math operations, filtering, etc.             | Event handlers passed to child components                 |
+
+
+🗣️ How to Answer in an Interview
+useMemo and useCallback are both used to optimize performance in React.
+useMemo is used when we want to avoid re-computing a value unless its dependencies change — it's helpful for expensive calculations.
+useCallback is used when we want to avoid re-creating the function reference across renders, especially when passing it to child components to prevent unnecessary re-renders.
+While they look similar in syntax, one caches a result, the other caches a function.
+
+🚀 Summary
+🧮 Use useMemo for: caching computed values.
+
+🛠️ Use useCallback for: preventing unnecessary function recreation.
+
+🧼 Use both only when needed; unnecessary usage can reduce readability without improving performance.
+
+<!-- ------------------------------------------------------------------------------------------------------------------------ -->
+
+<!-- Question 21:✅ Why is key important in React while looping? -->
+
+In React, when rendering a list of elements (usually using .map()), assigning a unique key prop to each element is crucial for performance and correctness.
+
+📌 What is a key?
+A key is a special string attribute you must include when creating lists of elements in React. It helps React identify which items have changed, been added, or removed.
+
+🔍 Why is it important?
+React uses keys to optimize re-rendering. When you update a list:
+
+React compares the current list with the previous list.
+
+With keys, React knows exactly which elements were updated and can efficiently re-render only those.
+
+Without keys, React re-renders everything or worse, may misidentify elements, leading to bugs and incorrect UI behavior.
+
+✅ Example Without key (⚠️ Not Recommended):
+
+const items = ['Apple', 'Banana', 'Cherry'];
+
+items.map((item) => <li>{item}</li>);
+This will cause a warning in React.
+
+
+✅ Example With key (✅ Recommended):
+
+const items = ['Apple', 'Banana', 'Cherry'];
+
+items.map((item, index) => <li key={index}>{item}</li>);
+OR if you have a unique ID:
+
+
+items.map((item) => <li key={item.id}>{item.name}</li>);
+
+🚫 Using index as key — be careful!
+Using index as a key is okay only if:
+
+The list doesn't change
+
+There is no reordering or removal
+
+Otherwise, use unique IDs whenever possible to avoid rendering issues.
+
+🧠 How to explain in an interview:
+"key is important in React because it helps identify elements in a list uniquely. It allows React to track which items changed and re-render them efficiently. Without keys, React may re-render incorrectly or lose component state, especially in dynamic lists."
+
+<!-- --------------------------------------------------------------------------------------------------------------- -->
+
+<!-- Question 22:📌 What is API Integration in React? -->
+
+API Integration in React means connecting your frontend (React app) with a backend service (like a REST API) to fetch, send, update, or delete data using HTTP requests (typically via fetch() or axios).
+
+🔧 Common Use Cases:
+Fetching user data from a server.
+
+Submitting form data to a backend.
+
+Retrieving real-time updates.
+
+Interacting with databases through backend services.
+
+✅ Tools Used for API Calls in React:
+fetch() (built-in browser API)
+
+axios (external promise-based HTTP client)
+
+🧠 How to explain API Integration in an Interview:
+"API integration in React allows us to connect the frontend to backend services and interact with external or internal data sources. We commonly use fetch or axios to send HTTP requests inside useEffect to ensure data is fetched when the component mounts. Once we receive the response, we update the state using hooks like useState to re-render the UI with the data."
+
+🚀 Pro Tips:
+Always handle errors (try...catch or .catch()).
+
+Use async/await for cleaner syntax.
+
+Use loading states to improve UX.
+
+Use useEffect() for side effects like API calls.
+
+Consider custom hooks for reusable fetch logic.
+
+<!-- ----------------------------------------------------------------------------------------------------------------- -->
+
+<!-- Question 22: Difference between fetch and axios -->
+
+✅ 1. What is fetch()?
+fetch() is a built-in JavaScript function used to make HTTP requests. It returns a Promise that resolves to the response.
+
+
+fetch('https://api.example.com/data')
+  .then(res => res.json())
+  .then(data => console.log(data))
+  .catch(error => console.error(error));
+
+Native browser API.
+
+Requires manual conversion to JSON.
+
+Not supported in older browsers (e.g., IE).
+
+
+✅ 2. What is axios?
+axios is a popular third-party HTTP client library that simplifies HTTP requests and provides many additional features.
+
+import axios from 'axios';
+
+axios.get('https://api.example.com/data')
+  .then(res => console.log(res.data))
+  .catch(error => console.error(error));
+
+Uses Promises like fetch.
+
+Automatically parses JSON.
+
+Supports request/response interception.
+
+Has better error handling.
+
+
+🔍 3. Key Differences
+| Feature                   | `fetch()`                      | `axios`                            |
+| ------------------------- | ------------------------------ | ---------------------------------- |
+| **Built-in**              | ✅ Yes                          | ❌ No (needs to be installed)       |
+| **Default JSON parsing**  | ❌ No (you must call `.json()`) | ✅ Yes                              |
+| **Request cancellation**  | ❌ No (manual AbortController)  | ✅ Yes (via built-in support)       |
+| **Interceptors**          | ❌ No                           | ✅ Yes (pre/post request handling)  |
+| **Timeout support**       | ❌ No                           | ✅ Yes                              |
+| **Error Handling**        | Must manually check `res.ok`   | Automatically throws on bad status |
+| **Older Browser Support** | ❌ No (needs polyfill)          | ✅ Yes                              |
+| **Request Configuration** | Verbose                        | Cleaner, simpler                   |
+
+
+🧠 Interview Answer Example:
+"fetch() is a native JavaScript method for making HTTP requests, but it requires manual handling of things like JSON conversion and HTTP errors. axios is a more feature-rich HTTP client that automatically handles JSON, timeouts, interceptors, and cleaner syntax. For basic requests, fetch is fine, but for complex applications, axios is usually preferred."
+
+<!-- ------------------------------------------------------------------------------------------------------------------- -->
+
+<!-- Question 23: Difference between React and Angular -->
+
+🔍 React vs Angular: A Detailed Comparison
+
+| Feature                   | **React**                                    | **Angular**                                 |
+| ------------------------- | -------------------------------------------- | ------------------------------------------- |
+| **Type**                  | Library for UI development                   | Full-fledged front-end framework            |
+| **Developer**             | Meta (Facebook)                              | Google                                      |
+| **Language**              | JavaScript (often with JSX)                  | TypeScript (superset of JavaScript)         |
+| **Architecture**          | Component-based (View layer only)            | Component-based with full MVC support       |
+| **DOM Handling**          | Virtual DOM                                  | Real DOM with change detection              |
+| **Data Binding**          | One-way binding (unidirectional)             | Two-way binding                             |
+| **Learning Curve**        | Moderate                                     | Steep (due to more features and TypeScript) |
+| **Routing**               | Uses external library (e.g., React Router)   | Built-in routing                            |
+| **State Management**      | Requires external tools (Redux, Context API) | Built-in services and RxJS                  |
+| **Performance**           | Faster with Virtual DOM                      | Good but slightly slower with large apps    |
+| **Community & Ecosystem** | Larger community, more flexibility           | Smaller but strong official ecosystem       |
+| **Testing Support**       | Jest, Enzyme, React Testing Library          | Jasmine, Karma (integrated)                 |
+
+
+🧠 How to Answer in an Interview
+“React is a JavaScript library primarily focused on building UI components. It’s lightweight and flexible, allowing developers to choose libraries for state management, routing, etc. Angular, on the other hand, is a full-fledged framework that comes with everything built-in including routing, form handling, HTTP, and dependency injection. React uses one-way data binding and virtual DOM for performance, while Angular uses two-way binding and real DOM. React is easier to get started with, but Angular offers a more opinionated structure for large-scale apps.”
+
+✅ When to Use What
+<!-- Use React when: -->
+You want flexibility and control over your tech stack.
+
+You’re building lightweight apps or SPAs.
+
+You want faster performance with Virtual DOM.
+
+
+<!-- Use Angular when: -->
+
+You need a full-stack framework.
+
+Your team is already familiar with TypeScript.
+
+You are working on large, enterprise-scale applications.
+
+<!-- --------------------------------------------------------------------------------------------------------------------- -->
